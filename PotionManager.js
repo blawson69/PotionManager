@@ -1,6 +1,6 @@
 /*
 PotionManager
-Enables easy adding & updating of Potions in the 5e Shaped Utilities section.
+Enables easy adding & updating of Potions in the 5e Shaped Sheet's Utilities section.
 
 On Github:	https://github.com/blawson69
 Contact me: https://app.roll20.net/users/1781274/ben-l
