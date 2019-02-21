@@ -1,6 +1,10 @@
 # PotionManager
 
-This [Roll20](http://roll20.net/) script fixes a drawback to the [5e Shaped Sheet](http://github.com/mlenser/roll20-character-sheets/tree/master/5eShaped) where the items in the Equipment section are only accessible by opening the character sheet, which is where most of the potions wind up. PotionManager adds potions to the Utility section instead of the Equipment section which allows easy access to potions using the sheet's built-in macro `%{shaped_utility}`. Use of the companion [Shaped Script](https://github.com/mlenser/roll20-api-scripts/tree/master/5eShapedScript) can automatically decrement the number of uses remaining for you and is highly recommended. (It does not decrement uses in the Equipment section.)
+This [Roll20](http://roll20.net/) script fixes a drawback to the [5e Shaped Sheet](http://github.com/mlenser/roll20-character-sheets/tree/master/5eShaped) where the items in the Equipment section are only accessible by opening the character sheet, which is where most of the potions wind up. PotionManager adds potions to the Utility section instead of the Equipment section which allows easy access to potions using the sheet's built-in macro `%{shaped_utility}`.
+
+My [GearManager](https://github.com/blawson69/GearManager) script manages a large number of select Adventuring Gear and Wondrous Items in a similar way, and is a great companion to this one.
+
+Use of the [Shaped Script](https://github.com/mlenser/roll20-api-scripts/tree/master/5eShapedScript) can automatically decrement the number of potions remaining for you and is highly recommended.
 
 ## How to Use
 
