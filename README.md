@@ -2,7 +2,7 @@
 
 **New in version 0.3:** Import your own homebrewed potions into PotionManager!
 
-This [Roll20](http://roll20.net/) script fixes a drawback to the [5e Shaped Sheet](http://github.com/mlenser/roll20-character-sheets/tree/master/5eShaped) where the items in the Equipment section are only accessible by opening the character sheet, which is where most of the potions wind up. PotionManager instead adds potions to the Utility section which allows easy access using the sheet's built-in `%{shaped_utility}` macro.
+This [Roll20](http://roll20.net/) script fixes a drawback to the [5e Shaped Sheet](http://github.com/mlenser/roll20-character-sheets/tree/master/5eShaped) where the items in the Equipment section are only accessible by opening the character sheet, which is where most of the potions wind up when dropping from the Compendium. PotionManager instead adds potions to the Utility section which allows easy access using the sheet's built-in `%{shaped_utility}` macro.
 
 My [GearManager](https://github.com/blawson69/GearManager) script manages a large number of select Adventuring Gear and Wondrous Items in a similar way, and is a great companion to this one.
 
