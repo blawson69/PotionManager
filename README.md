@@ -12,7 +12,7 @@ Use of the [Shaped Script](https://github.com/mlenser/roll20-api-scripts/tree/ma
 
 Type `!pm --help` into chat. This gives short instructions and buttons to view the Potions List and to [import your own potions](#homebrew-potions).
 
-The Potions List shows the name of each potion as a link which will add the potion to every selected token's character. If the character already has the potion in its Utility section, the script will increment uses by 1. Otherwise it will add the potion to the Utility section. The list also contains an **(i)** link that shows the potion's description in chat. This will *not* add the potion to any characters.
+The Potions List shows the name of each potion as a link which will add the potion to every selected token's character. If the character already has the potion in its Utility section, the script will increment uses by 1. The list also contains an **(i)** link that whispers the potion's description to you in chat. It *does not* add the potion to any characters.
 
 ## Homebrewed Potions
 
@@ -27,6 +27,6 @@ Guidlines:
 
 Examples:
 
-Potion of Typing|When you drink this potion, you can type 90 WPM for one hour.
+Potion of Typing|When you drink this potion, you can type [[1d12+90]] WPM for one hour.
 
 Potion of Mediocre Healing|The drinker of this potion receives a measly 6d4+18 of healing.|6|18
