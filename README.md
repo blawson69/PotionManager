@@ -1,6 +1,6 @@
 # PotionManager
 
-**New in v0.3:** Import your own homebrewed potions into PotionManager!
+**New in version 0.3:** Import your own homebrewed potions into PotionManager!
 
 This [Roll20](http://roll20.net/) script fixes a drawback to the [5e Shaped Sheet](http://github.com/mlenser/roll20-character-sheets/tree/master/5eShaped) where the items in the Equipment section are only accessible by opening the character sheet, which is where most of the potions wind up. PotionManager instead adds potions to the Utility section which allows easy access using the sheet's built-in `%{shaped_utility}` macro.
 
@@ -26,5 +26,7 @@ Guidlines:
 3. If your potion has healing properties, it requires two additional fields separated by pipes at the end. The first is the number of d4 to roll, and the second is the number added to the die roll. For instance, if your healing should be 6d4+18, you would add "|6|18" to the end.
 
 Examples:
+
 Potion of Typing|When you drink this potion, you can type 90 WPM for one hour.
+
 Potion of Mediocre Healing|The drinker of this potion receives a measly 6d4+18 of healing.|6|18
