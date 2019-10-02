@@ -4,7 +4,10 @@ Enables easy adding & updating of Potions in the 5e Shaped Sheet's Utilities sec
 
 On Github:	https://github.com/blawson69
 Contact me: https://app.roll20.net/users/1781274/ben-l
-Like this script? Buy me a coffee: https://venmo.com/theRealBenLawson
+
+Like this script? Buy me a coffee:
+    https://venmo.com/theRealBenLawson
+    https://paypal.me/theRealBenLawson
 */
 
 var PotionManager = PotionManager || (function () {
@@ -238,7 +241,6 @@ var PotionManager = PotionManager || (function () {
             default:
             potions = _.clone(state['PotionManager'].core_potions);
             _.each(state['PotionManager'].homebrew_potions, function (x) { potions.push(x); });
-            //log('potions after homebrew = ' + JSON.stringify(potions));
         }
         return potions;
     },
@@ -280,7 +282,6 @@ var PotionManager = PotionManager || (function () {
             {name: "Potion of Lightning Resistance", content: "When you drink this potion, you gain Resistance to lightning damage for 1 hour."},
             {name: "Potion of Mind Reading", content: "When you drink this potion, you gain the effect of the Detect Thoughts spell (save DC 13). The potion's dense, purple liquid has an ovoid cloud of pink floating in it."},
             {name: "Potion of Necrotic Resistance", content: "When you drink this potion, you gain Resistance to necrotic damage for 1 hour."},
-            {name: "Potion of Poison", content: "This concoction looks, smells, and tastes like a Potion of Healing or other beneficial potion. However, it is actually poison masked by Illusion magic. An Identify spell reveals its true Nature.\n\nIf you drink it, you take 3d6 poison damage, and you must succeed on a DC 13 Constitution saving throw or be Poisoned. At the start of each of your turns while you are Poisoned in this way, you take 3d6 poison damage. At the end of each of your turns, you can repeat the saving throw. On a successful save, the poison damage you take on your subsequent turns decreases by 1d6. The poison ends when the damage decreases to 0."},
             {name: "Potion of Poison Resistance", content: "When you drink this potion, you gain Resistance to poison damage for 1 hour."},
             {name: "Potion of Psychic Resistance", content: "When you drink this potion, you gain Resistance to psychic damage for 1 hour."},
             {name: "Potion of Radiant Resistance", content: "When you drink this potion, you gain Resistance to radiant damage for 1 hour."},
