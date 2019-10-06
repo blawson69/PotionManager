@@ -15,7 +15,7 @@ var PotionManager = PotionManager || (function () {
 
     //---- INFO ----//
 
-    var version = '0.3',
+    var version = '0.3.1',
         debugMode = false,
         styles = {
             button: 'background-color: #000; border-width: 0px; border-radius: 5px; padding: 5px 8px; color: #fff; text-align: center;',
@@ -29,10 +29,12 @@ var PotionManager = PotionManager || (function () {
         if (typeof state['PotionManager'].core_potions == 'undefined') state['PotionManager'].core_potions = setCorePotions();
         if (typeof state['PotionManager'].homebrew_potions == 'undefined') state['PotionManager'].homebrew_potions = [];
 
+        checkCorePotionUpdates();
         log('--> PotionManager v' + version + ' <-- Initialized');
         if (debugMode) {
             var d = new Date();
             showDialog('Debug Mode', 'PotionManager loaded at ' + d.toLocaleTimeString());
+            state['PotionManager'].core_potions = setCorePotions();
         }
     },
 
@@ -79,12 +81,12 @@ var PotionManager = PotionManager || (function () {
 
     commandList = function () {
         // List all potions with "add" and "view" links
-        var potions = getPotions(), list = '<table style="border: 1px; width: 100%;"><tr><td>Click to Add:</td><td>&nbsp;</td></tr>';
+        var potions = getPotions(), list = '<table style="border: 1px; width: 100%;">';
         _.each(potions, function(potion) {
             list += '<tr><td style="width: 100%"><a href="!pm --add ' + potion.name + '" title="Add to Selected Character(s)">' + potion.name + '</a></td><td><a style="font-family: Webdings;" href="!pm --view ' + potion.name + '" title="View ' + potion.name + '">i</a></td></tr>';
         });
         list += '</table>';
-        showDialog('Potions List', list);
+        showDialog('Potions', list);
     },
 
     commandView = function (msg) {
@@ -113,40 +115,27 @@ var PotionManager = PotionManager || (function () {
         var potion = _.findWhere(potions, {name: msg.content.substr(9).trim()});
         if (potion) {
             var newPotion, charNames = [], joiner = ' ', roll_template = '';
+            newPotion = {
+                content: potion.content,
+                name: potion.name,
+                type: 'POTION',
+                toggle_details: 0,
+                content_toggle: '1',
+                roll_template: '{{uses=@{uses}}} {{per_use=@{per_use}}} {{repeating_item=repeating_utility_ROW_ID}} {{content=@{content}}}',
+                weight_system: 'POUNDS',
+                weight: 0.5,
+                weight_per_use: '1',
+                weight_total: 0.5,
+                uses: 1,
+                per_use: 1
+            };
             if (potion.heal_dice) {
-                newPotion = {
-                    content: potion.content,
-                    name: potion.name,
-                    type: 'POTION',
-                    toggle_details: 0,
-                    content_toggle: '1',
-                    roll_template: '{{uses=@{uses}}} {{per_use=@{per_use}}} {{repeating_item=repeating_utility_ROW_ID}} {{heal=[[' + potion.heal_dice + 'd4[heal] + ' + potion.heal_bonus + '[bonus]]]}} {{content=@{content}}}',
-                    weight_system: 'POUNDS',
-                    heal_toggle: '1',
-                    heal_die: 'd4',
-                    heal_dice: potion.heal_dice,
-                    heal_bonus: potion.heal_bonus,
-                    weight: 0.5,
-                    weight_per_use: '1',
-                    weight_total: 0.5,
-                    uses: 1,
-                    per_use: 1
-                };
-            } else {
-                newPotion = {
-                    content: potion.content,
-                    name: potion.name,
-                    type: 'POTION',
-                    toggle_details: 0,
-                    content_toggle: '1',
-                    roll_template: '{{uses=@{uses}}} {{per_use=@{per_use}}} {{repeating_item=repeating_utility_ROW_ID}} {{content=@{content}}}',
-                    weight_system: 'POUNDS',
-                    weight: 0.5,
-                    weight_per_use: '1',
-                    weight_total: 0.5,
-                    uses: 1,
-                    per_use: 1
-                };
+                newPotion.roll_template = '{{uses=@{uses}}} {{per_use=@{per_use}}} {{repeating_item=repeating_utility_ROW_ID}} {{heal=[[' + potion.heal_dice + 'd4[heal] + ' + potion.heal_bonus + '[bonus]]]}} {{content=@{content}}}';
+                newPotion.weight_system = 'POUNDS';
+                newPotion.heal_toggle = '1';
+                newPotion.heal_die = 'd4';
+                newPotion.heal_dice = potion.heal_dice;
+                newPotion.heal_bonus = potion.heal_bonus;
             }
 
             _.each(msg.selected, function(obj) {
@@ -161,9 +150,7 @@ var PotionManager = PotionManager || (function () {
                         if (currPotionID) {
                             // Just update uses and total weight
                             var tmp_uses = findObjs({ type: 'attribute', characterid: char_id, name: 'repeating_utility_' + currPotionID + '_uses' })[0];
-                            var tmp_total = findObjs({ type: 'attribute', characterid: char_id, name: 'repeating_utility_' + currPotionID + '_weight_total' })[0];
-                            tmp_uses.setWithWorker('current', parseInt(tmp_uses.get('current')) + 1);
-                            tmp_total.setWithWorker('current', parseFloat(tmp_total.get('current')) + 0.5);
+                            tmp_uses.setWithWorker('current', toNumber(tmp_uses.get('current')) + 1);
                         } else {
                             // Add the new potion
                             const data = {};
@@ -219,7 +206,7 @@ var PotionManager = PotionManager || (function () {
     },
 
     findPotion = function (char_id, potion) {
-        var row_id = null;
+        var row_id;
         var char = getObj('character', char_id);
         if (char) {
             var charAttrs = findObjs({type: 'attribute', characterid: char_id}, {caseInsensitive: true});
@@ -231,7 +218,7 @@ var PotionManager = PotionManager || (function () {
 
     getPotions = function (kind = '') {
         var potions;
-        switch (kind) {
+        switch (kind.toLowerCase()) {
             case 'core':
             potions = state['PotionManager'].core_potions;
             break;
@@ -242,6 +229,7 @@ var PotionManager = PotionManager || (function () {
             potions = _.clone(state['PotionManager'].core_potions);
             _.each(state['PotionManager'].homebrew_potions, function (x) { potions.push(x); });
         }
+        potions = _.sortBy(potions, 'name');
         return potions;
     },
 
@@ -289,6 +277,40 @@ var PotionManager = PotionManager || (function () {
             {name: "Potion of Thunder Resistance", content: "When you drink this potion, you gain Resistance to thunder damage for 1 hour."},
             {name: "Potion of Water Breathing", content: "You can breathe Underwater for 1 hour after drinking this potion. Its cloudy green fluid smells of the sea and has a jellyfish-like bubble floating in it."}
         ];
+    },
+
+    checkCorePotionUpdates = function () {
+        var message = '', updated = [], removed = [];
+        _.each(setCorePotions(), function (x) {
+            if (!_.find(state['PotionManager'].core_potions, function (y) { return x.name === y.name && x.content === y.content; })) updated.push(x);
+        });
+        updated = _.pluck(updated, 'name');
+        _.each(state['PotionManager'].core_potions, function (x) {
+            if (!_.find(setCorePotions(), function (y) { return x.name === y.name && x.content === y.content; })) removed.push(x);
+        });
+        removed = _.pluck(removed, 'name');
+
+        message += 'The core potions list has been updated from the previous version.';
+        if (_.size(updated) > 0) {
+            message += 'The following potions have been added:';
+            message += '<ul><li>' + updated.join('</li><li>') + '</li></ul>';
+        }
+        if (_.size(removed) > 0) {
+            message += 'The following potions have been removed:';
+            message += '<ul><li>' + removed.join('</li><li>') + '</li></ul>';
+        }
+        message += '<div style="' + styles.buttonWrapper + '"><a style="' + styles.button + '" href="!pm --list">View List</a></div>';
+
+        if (_.size(updated) > 0 || _.size(removed) > 0) {
+            showDialog('Update Notice', message);
+            state['PotionManager'].core_potions = setCorePotions();
+        }
+    },
+
+    toNumber = function (num) {
+        var ret;
+        if (typeof num == 'string') num = num.replace(/\D*/i, '');
+        return Number(num);
     },
 
     showDialog = function (title, content) {
