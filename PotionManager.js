@@ -15,13 +15,15 @@ var PotionManager = PotionManager || (function () {
 
     //---- INFO ----//
 
-    var version = '0.3.1',
+    var version = '0.4',
         debugMode = false,
         styles = {
             button: 'background-color: #000; border-width: 0px; border-radius: 5px; padding: 5px 8px; color: #fff; text-align: center;',
             textButton: 'background-color: transparent; border: none; padding: 0; color: #591209; text-decoration: underline;',
             buttonWrapper: 'text-align: center; margin: 14px 0 12px 0; clear: both;',
-            code: 'font-family: "Courier New", Courier, monospace; background-color: #ddd; color: #000; padding: 2px 4px;'
+            code: 'font-family: "Courier New", Courier, monospace; background-color: #ddd; color: #000; padding: 2px 4px;',
+            subtitle: 'margin-top: -4px; padding-bottom: 4px; color: #666; font-size: 1.125em; font-variant: small-caps;',
+            infoLink: 'text-decoration: none; font-family: Webdings;'
         },
 
     checkInstall = function () {
@@ -46,7 +48,7 @@ var PotionManager = PotionManager || (function () {
 			if (parms[1] && playerIsGM(msg.playerid)) {
 				switch (parms[1]) {
 					case '--add':
-						commandAdd(msg);
+						commandAdd(msg, false);
 						break;
                     case '--list':
                         commandList();
@@ -83,7 +85,7 @@ var PotionManager = PotionManager || (function () {
         // List all potions with "add" and "view" links
         var potions = getPotions(), list = '<table style="border: 1px; width: 100%;">';
         _.each(potions, function(potion) {
-            list += '<tr><td style="width: 100%"><a href="!pm --add ' + potion.name + '" title="Add to Selected Character(s)">' + potion.name + '</a></td><td><a style="font-family: Webdings;" href="!pm --view ' + potion.name + '" title="View ' + potion.name + '">i</a></td></tr>';
+            list += '<tr><td style="width: 100%"><a href="!pm --add ' + potion.name + '" title="Add to Selected Character(s)">' + potion.name + '</a></td><td><a style=\'' + styles.infoLink + '\' href="!pm --view ' + potion.name + '" title="View ' + potion.name + '">i</a></td></tr>';
         });
         list += '</table>';
         showDialog('Potions', list);
@@ -93,26 +95,30 @@ var PotionManager = PotionManager || (function () {
         // Displays the potion's name and description in chat
         var potions = getPotions();
         var button = '<div style="' + styles.buttonWrapper + '"><a style="' + styles.button + '" href="!pm --list">&#9668; Back to List</a></div>';
+        var category = '<div style="' + styles.subtitle + '">Adventuring Gear</div>';
         var name = msg.content.substr(10).trim();
         var potion = _.findWhere(potions, {name: name});
         if (potion) {
-            showDialog(potion.name, potion.content.replace(/\n/g, '<br>').replace(/\[{2}([^\]]*)\]{2}/g, '<span style=\'color: #c00;\'>$1</span>') + button);
+            showDialog(potion.name, category + potion.content.replace(/\n/g, '<br>').replace(/\[{2}([^\]]*)\]{2}/g, '<span style=\'color: #c00;\'>$1</span>') + button);
         } else {
             showDialog('Error', name + ' is not a valid potion.' + button);
         }
     },
 
-    commandAdd = function (msg) {
+    commandAdd = function (msg, external = true) {
         // Add a potion to selected character(s)
+        var retval = true;
 		if (!msg.selected || !msg.selected.length) {
-			showDialog('Error', 'No tokens are selected!');
-			return;
+            retval.success = false;
+			if (!external) showDialog('Error', 'No tokens are selected!');
+            else log('PotionManager Error: No tokens are selected!');
+			return retval;
 		}
 
         // Verify that a valid potion name was given
         var potions = getPotions();
         var button = '<div style="' + styles.buttonWrapper + '"><a style="' + styles.button + '" href="!pm --list">&#9668; Back to List</a></div>';
-        var potion = _.findWhere(potions, {name: msg.content.substr(9).trim()});
+        var potion = _.findWhere(potions, {name: msg.content.replace('!pm --add', '').trim()});
         if (potion) {
             var newPotion, charNames = [], joiner = ' ', roll_template = '';
             newPotion = {
@@ -172,10 +178,13 @@ var PotionManager = PotionManager || (function () {
             // Provide feedback
             if (charNames.length > 1) charNames[charNames.length-1] = 'and ' + charNames[charNames.length-1];
     		if (charNames.length > 2) joiner = ', ';
-            showDialog('Potion Added', 'One ' + potion.name + ' was given to ' + charNames.join(joiner) + '.' + button);
+            if (!external) showDialog('Potion Added', 'One ' + potion.name + ' was given to ' + charNames.join(joiner) + '.' + button);
         } else {
-            showDialog('Potion Not Added', 'The potion "' + tmpName + '" does not exist! Try adding from the list this time.' + button);
+            retval = false;
+            if (!external) showDialog('Potion Not Added', 'The potion "' + tmpName + '" does not exist! Try adding from the list this time.' + button);
+            else log('PotionManager Error: The potion "' + tmpName + '" does not exist.');
         }
+        return retval;
     },
 
     commandImport = function () {
@@ -362,6 +371,7 @@ var PotionManager = PotionManager || (function () {
 		checkInstall: checkInstall,
 		registerEventHandlers: registerEventHandlers,
         getPotions: getPotions,
+        addPotion: commandAdd,
         version: version
 	};
 }());
